@@ -1,5 +1,5 @@
-const { mineBlock } = require('./block');
-const Block = require('./block');
+const { mineBlock } = require('./blockchain/block');
+const Block = require('./blockchain/block');
 
 // const block = new Block('foo', 'bar', 'zoo', 'baz');
 // console.log(block.toString());
