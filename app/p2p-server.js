@@ -1,36 +1,51 @@
-const WebSocket = require('ws');
+const Websocket = require('ws');
+const P2P_PORT = process.argv[3];
+const peers = process.argv[4] ? process.argv[4].split(',') : [];
+// ws://localhost:5001
 
-const P2P_PORT = process.env.P2P_PORT || 5001;
-const peers = process.env.PEERS ? process.env.PEERS.slipt(',') : [];
+class P2pServer {
+  constructor(blockchain) {
+    this.blockchain = blockchain;
+    this.sockets = [];
+  }
 
+  listen() {
+    const server = new Websocket.Server({ port: P2P_PORT });
+    server.on('connection', socket => this.connectSocket(socket));
+    this.connectToPeers();
+    console.log(`peer to peer connection on: ${P2P_PORT}`)
+  }
 
-class P2pServer{
-    constructor(blockchain){
-        this.blockchain = blockchain;
-        this.sockets = [];
-    }
+  connectToPeers() {
+    console.log(peers)
+    peers.forEach(peer => {
+        const socket = new Websocket(peer);
+      socket.on('open', () => this.connectSocket(socket));
+    });
+  }
 
-    listen(){
-        const server = new WebSocket.Server({port: P2P_PORT});
-        server.on('connection', socket => this.connectSocket(socket));
+  connectSocket(socket) {
+    this.sockets.push(socket);
+    console.log('Socket connected');
 
-        this.connectToPeers();
-        console.log(`Listining for peer-to-peer connections on: ${P2P_PORT}`);
-    }
+    this.messageHandler(socket);
+    this.sendChain(socket);
+  }
 
-    connectToPeers(){
-        peers.forEach(peer => {
-            const socket = new WebSocket(peer);
+  messageHandler(socket){
+      socket.on('message', message => {
+          const data = JSON.parse(message)
+          this.blockchain.replaceChain(data);
+      })
+  }
 
-            socket.on('open', ()=> this.connectSocket(socket))
-        });
-    }
-    
-    connectSocket(socket){
-        this.sockets.push(socket);
-        console.log('Socket Connected');
-    }
+  sendChain(socket){      
+    socket.send(JSON.stringify(this.blockchain.chain))
+  }
+
+  syncChain(){
+      this.sockets.forEach(socket => this.sendChain(socket));
+  }
 }
-
 
 module.exports = P2pServer;
