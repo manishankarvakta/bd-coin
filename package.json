@@ -11,6 +11,9 @@
     "dev2": "nodemon --watch dev -e js ./app 3002 5002 ws://localhost:5001",
     "dev3": "nodemon --watch dev -e js ./app 3003 5003 ws://localhost:5001,ws://localhost:5002"
   },
+  "jest": {
+    "testEnvironment": "node"
+    },
   "keywords": [],
   "author": "",
   "license": "ISC",

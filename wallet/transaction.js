@@ -1,4 +1,4 @@
-const ChainUtil = require(',,/chain-util');
+const ChainUtil = require('../chain-util');
 
 class Transaction {
     constructor(){
@@ -10,7 +10,7 @@ class Transaction {
     static newTransaction(senderWallet, recipient, amount){
         const transaction = new this();
 
-        if(amount > senderWallet.banance){
+        if(amount > senderWallet.balance){
             console.log(`Amount: ${amount} exceeds balance.`);
             return;
         }
