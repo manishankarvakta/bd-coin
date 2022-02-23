@@ -20,7 +20,18 @@ class Transaction {
             {amount, address: recipient}
         ])
 
+        Transaction.signTaransaction(transaction, senderWallet);
+
         return transaction;
+    }
+
+    static signTaransaction(transaction, senderWallet){
+        transaction.input = {
+            timestamp: Date.now(),
+            amount: senderWallet.balance,
+            address:senderWallet.publicKey,
+            signature: senderWallet.sign(ChainUtil.hash(transaction.outputs))
+        }
     }
 }
 
